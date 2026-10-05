@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تاتش بلس | بطاقات وقواعد التقييم والتفاعل الذكية NFC & QR</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts (Cairo & Plus Jakarta Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            900: '#0f172a',
+                        },
+                        google: '#4285F4',
+                        instagram: '#E1306C',
+                        tiktok: '#00f2fe',
+                        facebook: '#1877F2',
+                        whatsapp: '#25D366'
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Cairo', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'glow-google': '0 0 40px -5px rgba(66, 133, 244, 0.4)',
+                        'glow-insta': '0 0 40px -5px rgba(225, 48, 108, 0.4)',
+                        'glow-tiktok': '0 0 40px -5px rgba(0, 242, 254, 0.4)',
+                        'glass-card': '0 20px 50px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2)',
+                        '3d-depth': '0 30px 60px -12px rgba(0,0,0,0.5), 0 18px 36px -18px rgba(0,0,0,0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom CSS Styles for Realistic 3D Reflections and Animations -->
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #090d16;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .acrylic-glow {
+            position: relative;
+        }
+        .acrylic-glow::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), transparent, rgba(255,255,255,0.1));
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        /* Realistic Card Gloss Sheen */
+        .card-sheen {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-sheen::after {
+            content: '';
+            position: absolute;
+            top: -150%;
+            left: -150%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(
+                115deg,
+                transparent 20%,
+                rgba(255, 255, 255, 0.25) 45%,
+                rgba(255, 255, 255, 0.5) 50%,
+                rgba(255, 255, 255, 0.25) 55%,
+                transparent 80%
+            );
+            transform: rotate(25deg);
+            transition: all 0.8s ease;
+            pointer-events: none;
+        }
+        .card-sheen:hover::after {
+            top: 100%;
+            left: 100%;
+        }
+
+        /* 3D Dynamic Tilt Container */
+        .tilt-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+
+        /* Floating Animation */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(1.5deg); }
+        }
+        .animate-float {
+            animation: floatSlow 6s ease-in-out infinite;
+        }
+
+        /* NFC Pulse Wave Animation */
+        @keyframes nfcPulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 0.3; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .nfc-wave {
+            animation: nfcPulse 2s infinite ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0f19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- Top Bar Notice -->
+    <div class="bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white text-xs md:text-sm py-2 px-4 text-center font-medium shadow-md">
+        <span class="inline-flex items-center gap-2">
+            <span class="flex h-2 w-2 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            🚀 عرض خاص: توصيل مجاني وبرمجة مجانية لجميع البطاقات عند طلب قاعدتين أو أكثر!
+        </span>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-gray-800/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-wifi rotate-90"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-blue-400">
+                            TOUCH<span class="text-blue-500">PLUS</span>
+                        </span>
+                        <span class="block text-[10px] text-gray-400 tracking-wider font-semibold">SMART TAP SOLUTIONS</span>
+                    </div>
+                </a>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-300">
+                    <a href="#customizer" class="hover:text-blue-400 transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i> المصمم الذكي 3D
+                    </a>
+                    <a href="#demo" class="hover:text-blue-400 transition-colors">طريقة العمل الحية</a>
+                    <a href="#products" class="hover:text-blue-400 transition-colors">تشكيلة القواعد</a>
+                    <a href="#roi" class="hover:text-blue-400 transition-colors">حاسبة النمو</a>
+                    <a href="#features" class="hover:text-blue-400 transition-colors">المميزات</a>
+                    <a href="#faq" class="hover:text-blue-400 transition-colors">الأسئلة الشائعة</a>
+                </div>
+
+                <!-- Right Action Buttons -->
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700/80 border border-gray-700 text-gray-200 transition-all">
+                        <i class="fa-solid fa-bag-shopping text-lg"></i>
+                        <span id="cartBadge" class="absolute -top-1.5 -right-1.5 bg-blue-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-gray-900">0</span>
+                    </button>
+                    <a href="#customizer" class="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-blue-600/30 transition-all hover:scale-105 active:scale-95">
+                        <i class="fa-solid fa-bolt"></i> صمّم بطاقتك الآن
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative py-16 md:py-24 overflow-hidden">
+        <!-- Background Lighting FX -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none"></div>
+        <div class="absolute top-1/3 right-10 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Text Content -->
+                <div class="lg:col-span-7 text-center lg:text-right space-y-8">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-blue-500/30 text-blue-300 text-xs md:text-sm font-semibold">
+                        <i class="fa-solid fa-star text-amber-400"></i>
+                        <span>الجيل الجديد من حلول التقييم والمتابعة الفورية للأنشطة التجارية</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight">
+                        حول زوارك إلى <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">تقييمات ومتابعين</span> بلمسة هاتف واحدة!
+                    </h1>
+
+                    <p class="text-lg md:text-xl text-gray-300 max-w-2xl font-light leading-relaxed">
+                        بطاقات وقواعد التفاعل الذكية المزودة بتقنية <span class="text-white font-semibold">NFC</span> و <span class="text-white font-semibold">QR Code</span>. تُمكّن عملاءك من تقييم نشاطك على جوجل أو متابعة حساباتك بلمسة واحدة وبثوانٍ معدودة دون بحث أو عناء.
+                    </p>
+
+                    <!-- Feature Bullets -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2 text-right">
+                        <div class="flex items-center gap-2.5 text-gray-300 text-sm font-medium">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                            <span>بدون اشتراك شهري</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 text-gray-300 text-sm font-medium">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                            <span>أكريليك عالي الجودة</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 text-gray-300 text-sm font-medium">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </div>
+                            <span>برمجة فورية مجانية</span>
+                        </div>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="#customizer" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-extrabold text-lg shadow-xl shadow-blue-600/30 hover:shadow-blue-600/50 hover:scale-105 active:scale-95 transition-all text-center flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-sliders"></i> ابدأ التخصيص الحيوية
+                        </a>
+                        <button onclick="openDemoModal()" class="w-full sm:w-auto px-8 py-4 rounded-2xl glass-panel hover:bg-gray-800/90 text-white font-bold text-lg border border-gray-700 transition-all hover:scale-105 flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-circle-play text-blue-400"></i> جرب طريقة اللمس (Live Demo)
+                        </button>
+                    </div>
+
+                    <!-- Trust Stats -->
+                    <div class="pt-8 border-t border-gray-800/80 grid grid-cols-3 gap-6">
+                        <div>
+                            <p class="text-2xl lg:text-3xl font-black text-white">+15,000</p>
+                            <p class="text-xs text-gray-400 font-medium">بطاقة مفعلة بالمملكة والخليج</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl lg:text-3xl font-black text-white">4.9/5</p>
+                            <p class="text-xs text-gray-400 font-medium">تقييم أصحاب الأعمال</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl lg:text-3xl font-black text-white">%350+</p>
+                            <p class="text-xs text-gray-400 font-medium">زيادة في تقييمات جوجل</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Hero Visual Showcase (3D Interactive Render Fan Cards) -->
+                <div class="lg:col-span-5 relative flex justify-center">
+                    <div class="relative w-full max-w-[420px] aspect-[4/5] flex items-center justify-center">
+                        
+                        <!-- Floating Glass Pedestal Shadow -->
+                        <div class="absolute bottom-4 w-3/4 h-8 bg-black/60 rounded-[100%] blur-xl"></div>
+
+                        <!-- Card 1: TikTok (Back left) -->
+                        <div class="absolute w-56 h-88 rounded-2xl p-5 bg-gradient-to-b from-gray-950 via-gray-900 to-black border border-gray-800 shadow-2xl -rotate-12 -translate-x-16 translate-y-4 hover:rotate-0 hover:scale-110 hover:z-30 transition-all duration-500 card-sheen">
+                            <div class="flex flex-col h-full justify-between items-center text-center">
+                                <i class="fa-brands fa-tiktok text-4xl text-cyan-400 mt-2"></i>
+                                <div>
+                                    <p class="text-xs font-bold tracking-widest text-gray-400">TIKTOK</p>
+                                    <p class="text-sm font-black text-white">TO FOLLOW</p>
+                                </div>
+                                <div class="w-16 h-16 rounded-xl bg-gray-900 border border-gray-800 flex items-center justify-center">
+                                    <i class="fa-solid fa-wifi text-cyan-400 rotate-90 text-xl"></i>
+                                </div>
+                                <div class="w-12 h-12 bg-white rounded-lg p-1">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://tiktok.com" alt="QR" class="w-full h-full">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Instagram (Back right) -->
+                        <div class="absolute w-56 h-88 rounded-2xl p-5 bg-gradient-to-b from-purple-600 via-pink-600 to-amber-500 border border-white/20 shadow-2xl rotate-12 translate-x-16 translate-y-2 hover:rotate-0 hover:scale-110 hover:z-30 transition-all duration-500 card-sheen">
+                            <div class="flex flex-col h-full justify-between items-center text-center text-white">
+                                <i class="fa-brands fa-instagram text-4xl mt-2"></i>
+                                <div>
+                                    <p class="text-xs font-bold tracking-widest text-pink-200">INSTAGRAM</p>
+                                    <p class="text-sm font-black">TO FOLLOW</p>
+                                </div>
+                                <div class="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
+                                    <i class="fa-solid fa-wifi rotate-90 text-xl"></i>
+                                </div>
+                                <div class="w-12 h-12 bg-white rounded-lg p-1">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://instagram.com" alt="QR" class="w-full h-full">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Google Reviews (Front Center Featured) -->
+                        <div class="relative z-20 w-64 h-96 rounded-2xl p-6 bg-white border border-gray-200 shadow-3d-depth animate-float card-sheen hover:scale-105 transition-all duration-300">
+                            <!-- Glossy Reflection Effect overlay -->
+                            <div class="absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/40 to-transparent pointer-events-none"></div>
+                            
+                            <div class="flex flex-col h-full justify-between items-center text-center text-gray-900">
+                                <!-- Top Stars & Logo -->
+                                <div>
+                                    <div class="flex justify-center gap-1 text-amber-400 text-xs mb-1">
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star"></i>
+                                        <i class="fa-solid fa-star"></i>
+                                    </div>
+                                    <div class="w-12 h-12 mx-auto mb-2 flex items-center justify-center">
+                                        <svg class="w-10 h-10" viewBox="0 0 24 24">
+                                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-base font-black tracking-tight text-gray-900">REVIEW US ON GOOGLE</h3>
+                                    <div class="flex justify-center gap-1 text-amber-400 text-sm mt-1">
+                                        ★★★★★
+                                    </div>
+                                </div>
+
+                                <!-- Middle Tap Zone -->
+                                <div class="w-full py-3 px-2 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center text-blue-600 font-bold nfc-wave">
+                                        <i class="fa-solid fa-wifi rotate-90"></i>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[10px] text-gray-500 font-bold">إشارة اللمس السريعة</p>
+                                        <p class="text-xs font-black text-gray-800">TAP HERE</p>
+                                    </div>
+                                </div>
+
+                                <!-- Bottom QR Code Section -->
+                                <div class="flex items-center justify-between w-full pt-2 border-t border-gray-100">
+                                    <div class="text-right text-[10px] text-gray-500 font-medium leading-tight">
+                                        <span>أو امسح الرمز</span><br>
+                                        <span class="font-bold text-gray-700">SCAN QR</span>
+                                    </div>
+                                    <div class="w-12 h-12 bg-gray-100 p-1 rounded-lg border border-gray-300">
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://maps.google.com" alt="Google Review QR" class="w-full h-full">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive 3D Card Studio Section -->
+    <section id="customizer" class="py-20 bg-gray-950 relative border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase tracking-widest">
+                    3D LIVE CUSTOMIZER
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">
+                    صمّم قاعدة تقييماتك الذكية وانظر النتيجة فواً
+                </h2>
+                <p class="text-gray-400 mt-2 text-sm md:text-base">
+                    اختر المنصة، نوع المادة، اكتب اسم منشأتك، وضع رابط خرائط جوجل أو حسابك لتشاهد النموذج ثلاثي الأبعاد مباشرة.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                
+                <!-- Customizer Form Controls -->
+                <div class="lg:col-span-6 glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+                    
+                    <!-- 1. Platform Selector -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-200 mb-3">
+                            1. اختر المنصة المطلوبة:
+                        </label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setPlatform('google')" id="btn-google" class="platform-btn p-3 rounded-2xl border border-blue-500 bg-blue-500/20 text-white font-bold text-xs flex flex-col items-center gap-2 transition-all">
+                                <i class="fa-brands fa-google text-2xl text-blue-400"></i>
+                                <span>تقييمات جوجل</span>
+                            </button>
+                            <button onclick="setPlatform('instagram')" id="btn-instagram" class="platform-btn p-3 rounded-2xl border border-gray-800 hover:border-pink-500 bg-gray-900/60 text-gray-300 font-bold text-xs flex flex-col items-center gap-2 transition-all">
+                                <i class="fa-brands fa-instagram text-2xl text-pink-500"></i>
+                                <span>إنستغرام</span>
+                            </button>
+                            <button onclick="setPlatform('tiktok')" id="btn-tiktok" class="platform-btn p-3 rounded-2xl border border-gray-800 hover:border-cyan-400 bg-gray-900/60 text-gray-300 font-bold text-xs flex flex-col items-center gap-2 transition-all">
+                                <i class="fa-brands fa-tiktok text-2xl text-cyan-400"></i>
+                                <span>تيك توك</span>
+                            </button>
+                            <button onclick="setPlatform('facebook')" id="btn-facebook" class="platform-btn p-3 rounded-2xl border border-gray-800 hover:border-blue-600 bg-gray-900/60 text-gray-300 font-bold text-xs flex flex-col items-center gap-2 transition-all">
+                                <i class="fa-brands fa-facebook text-2xl text-blue-500"></i>
+                                <span>فيسبوك</span>
+                            </button>
+                            <button onclick="setPlatform('whatsapp')" id="btn-whatsapp" class="platform-btn p-3 rounded-2xl border border-gray-800 hover:border-emerald-500 bg-gray-900/60 text-gray-300 font-bold text-xs flex flex-col items-center gap-2 transition-all">
+                                <i class="fa-brands fa-whatsapp text-2xl text-emerald-400"></i>
+                                <span>واتساب مباشر</span>
+                            </button>
+                            <button onclick="setPlatform('tripadvisor')" id="btn-tripadvisor" class="platform-btn p-3 rounded-2xl border border-gray-800 hover:border-amber-400 bg-gray-900/60 text-gray-300 font-bold text-xs flex flex-col items-center gap-2 transition-all">
+                                <i class="fa-solid fa-umbrella-beach text-2xl text-amber-400"></i>
+                                <span>تريب أدفايزر</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. Material & Stand Type -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-200 mb-3">
+                            2. نوع القاعدة والمادة المصنوعة منها:
+                        </label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setMaterial('acrylic')" id="mat-acrylic" class="mat-btn p-3 rounded-xl border border-blue-500 bg-gray-800 text-white font-semibold text-xs text-center transition-all">
+                                <i class="fa-solid fa-gem text-blue-400 block mb-1 text-base"></i>
+                                أكريليك شفاف فاخر
+                            </button>
+                            <button onclick="setMaterial('pvc')" id="mat-pvc" class="mat-btn p-3 rounded-xl border border-gray-800 bg-gray-900 text-gray-400 font-semibold text-xs text-center transition-all">
+                                <i class="fa-solid fa-id-card block mb-1 text-base"></i>
+                                بطاقات PVC مقواة
+                            </button>
+                            <button onclick="setMaterial('metal')" id="mat-metal" class="mat-btn p-3 rounded-xl border border-gray-800 bg-gray-900 text-gray-400 font-semibold text-xs text-center transition-all">
+                                <i class="fa-solid fa-crown text-amber-400 block mb-1 text-base"></i>
+                                معدنية فاخرة
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 3. Business Name & Link Input -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-200 mb-1">3. اسم المنشأة / التجارة:</label>
+                            <input type="text" id="inputBizName" oninput="updateCardPreview()" value="مطعم وكافيه السعادة" placeholder="مثال: عيادات الشفاء / كافيه روز" class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-200 mb-1">4. رابط صفحة التقييم / الحساب:</label>
+                            <input type="url" id="inputTargetUrl" oninput="updateCardPreview()" value="https://g.page/r/example" placeholder="ضع رابط خرائط جوجل أو حسابك هنا" class="w-full px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 text-white focus:outline-none focus:border-blue-500 transition-colors text-sm text-left dir-ltr">
+                        </div>
+                    </div>
+
+                    <!-- Quantity & Price Summary -->
+                    <div class="p-4 rounded-2xl bg-gray-900/80 border border-gray-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 block">السعر الإجمالي (شامل البرمجة):</span>
+                            <span id="customizerPrice" class="text-2xl font-black text-emerald-400">149 ر.س</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="text-xs text-gray-300 font-bold">الكمية:</label>
+                            <div class="flex items-center bg-gray-800 rounded-xl border border-gray-700 p-1">
+                                <button onclick="changeQty(-1)" class="w-7 h-7 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-bold text-sm flex items-center justify-center">-</button>
+                                <span id="customizerQty" class="w-8 text-center text-sm font-bold text-white">1</span>
+                                <button onclick="changeQty(1)" class="w-7 h-7 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-bold text-sm flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add to Cart CTA -->
+                    <button onclick="addCustomizedToCart()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-base shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-cart-plus"></i> إضافـة هذا التصميم إلى السلـة
+                    </button>
+
+                </div>
+
+                <!-- Live 3D Interactive Card Preview Window -->
+                <div class="lg:col-span-6 flex flex-col items-center justify-center">
+                    
+                    <div class="text-center mb-4">
+                        <span class="text-xs text-gray-400 font-semibold">
+                            <i class="fa-solid fa-arrows-spin text-blue-400 animate-spin ml-1"></i> حرّك الماوس فوق البطاقة لتجربة التجسيم الثلاثي الأبعاد (3D Parallax Tilt)
+                        </span>
+                    </div>
+
+                    <!-- 3D Canvas Box -->
+                    <div id="tiltContainer" class="tilt-card relative w-72 sm:w-80 h-[460px] rounded-3xl p-6 transition-all duration-200 cursor-pointer shadow-3d-depth border border-white/20 card-sheen bg-white text-gray-900" onmousemove="handleTilt(event)" onmouseleave="resetTilt()">
+                        
+                        <!-- Internal Plastic Sheen Shader -->
+                        <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/10 via-white/50 to-transparent pointer-events-none"></div>
+
+                        <!-- Card Dynamic Content Wrapper -->
+                        <div id="previewCardContent" class="flex flex-col h-full justify-between items-center text-center relative z-10">
+                            
+                            <!-- Header Logo & Stars -->
+                            <div>
+                                <div id="previewStars" class="flex justify-center gap-1 text-amber-400 text-sm mb-2">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                
+                                <div id="previewLogo" class="w-16 h-16 mx-auto mb-2 flex items-center justify-center">
+                                    <svg class="w-12 h-12" viewBox="0 0 24 24">
+                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                    </svg>
+                                </div>
+
+                                <h3 id="previewTitle" class="text-lg font-black tracking-tight text-gray-900 leading-tight">
+                                    REVIEW US ON GOOGLE
+                                </h3>
+                                <p id="previewBizNameDisplay" class="text-xs font-bold text-blue-600 mt-1">
+                                    مطعم وكافيه السعادة
+                                </p>
+                            </div>
+
+                            <!-- NFC Tap Target Zone -->
+                            <div class="w-full py-4 px-3 rounded-2xl bg-gray-50/90 border border-gray-200 flex items-center justify-center gap-3 shadow-inner">
+                                <div class="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md nfc-wave">
+                                    <i class="fa-solid fa-wifi rotate-90"></i>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[11px] text-gray-500 font-bold">ضع الهاتف هنا للمس السريع</p>
+                                    <p class="text-sm font-black text-gray-900">TAP HERE (NFC)</p>
+                                </div>
+                            </div>
+
+                            <!-- Bottom QR Code & Branding Footer -->
+                            <div class="w-full pt-3 border-t border-gray-200/80 flex items-center justify-between">
+                                <div class="text-right">
+                                    <p class="text-[10px] text-gray-400 font-semibold">أو امسح الرمز بدلاً من اللمس</p>
+                                    <p class="text-xs font-black text-gray-800">SCAN QR CODE</p>
+                                    <span class="text-[9px] text-blue-500 font-mono mt-1 block">touchplus.sa</span>
+                                </div>
+                                <div class="w-16 h-16 bg-white p-1 rounded-xl border border-gray-300 shadow-sm">
+                                    <img id="previewQrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://g.page/r/example" alt="QR Code" class="w-full h-full">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Stand Acrylic Pedestal Base Visual -->
+                    <div class="w-48 h-5 bg-gradient-to-r from-gray-300 via-white to-gray-400 rounded-b-xl shadow-2xl mt-[-10px] z-0 border border-gray-400/50"></div>
+
+                    <!-- Interactive Demo Button under Preview -->
+                    <button onclick="simulateTapOnCustomCard()" class="mt-8 px-6 py-2.5 rounded-full glass-panel hover:bg-blue-600/30 border border-blue-500/40 text-blue-300 font-bold text-xs flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-mobile-screen-button text-base text-blue-400"></i> اختبر استجابة هذه البطاقة على الهاتف الآن
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section id="demo" class="py-20 bg-gray-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase">
+                    EASY 2-STEP TECHNOLOGY
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">
+                    كيف تعمل البطاقات والقواعد الذكية؟
+                </h2>
+                <p class="text-gray-400 mt-2 text-sm md:text-base">
+                    لا يتطلب الأمر تثبيت أي تطبيقات من العميل! كل ما يحتاجه هو هاتفه الذكي فقط.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Method 1: NFC Tap -->
+                <div class="glass-panel p-8 rounded-3xl border border-gray-800 hover:border-blue-500/40 transition-all relative overflow-hidden group">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-black text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-wifi rotate-90"></i>
+                    </div>
+                    <span class="text-xs font-bold text-blue-400 tracking-widest uppercase">التقنية الأولى (الأسرع)</span>
+                    <h3 class="text-2xl font-bold text-white mt-1 mb-3">1. الاتصال قريب المدى (NFC Tap)</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                        يضع العميل الجزء الخلفي من هاتفه على الشريحة المدمجة أعلى البطاقة. يظهر إشعار فوراً على شاشة الهاتف، وبمجرد الضغط عليه ينتقل مباشرة لصفحة التقييم أو المتابعة في أقل من ثانيتين.
+                    </p>
+                    <div class="flex items-center gap-3 text-xs text-gray-400 font-semibold bg-gray-950/60 p-3 rounded-xl">
+                        <i class="fa-solid fa-mobile-button text-emerald-400 text-base"></i>
+                        <span>مدعوم تلقائياً في جميع أجهزة الآيفون والأندرويد الحديثة دون تشغيل الكاميرا.</span>
+                    </div>
+                </div>
+
+                <!-- Method 2: QR Code Scan -->
+                <div class="glass-panel p-8 rounded-3xl border border-gray-800 hover:border-purple-500/40 transition-all relative overflow-hidden group">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center font-black text-2xl mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-qrcode"></i>
+                    </div>
+                    <span class="text-xs font-bold text-purple-400 tracking-widest uppercase">التقنية الثانية (البديلة)</span>
+                    <h3 class="text-2xl font-bold text-white mt-1 mb-3">2. رمز الاستجابة السريعة (QR Code)</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                        بالنسبة للعملاء الذين يفضلون استخدام كاميرا الهاتف أو الأجهزة القديمة، يمكنهم فتح الكاميرا وتوجيهها نحو كود الـ QR المطبوع بوضوح بالأسفل ليظهر الرابط فوراً.
+                    </p>
+                    <div class="flex items-center gap-3 text-xs text-gray-400 font-semibold bg-gray-950/60 p-3 rounded-xl">
+                        <i class="fa-solid fa-camera text-purple-400 text-base"></i>
+                        <span>يعمل مع أي كاميرا هاتف أو تطبيق ماسح أكواد بسهولة تامة.</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Live Simulator Launcher Banner -->
+            <div class="mt-12 glass-panel rounded-3xl p-8 border border-blue-500/30 text-center relative overflow-hidden bg-gradient-to-r from-blue-900/30 via-indigo-900/20 to-purple-900/30">
+                <h3 class="text-2xl font-black text-white mb-2">هل ترغب في تجربة شعور العميل عند التلميس؟</h3>
+                <p class="text-gray-300 text-sm max-w-xl mx-auto mb-6">
+                    اضغط على الزر أدناه لتشغيل محاكي التلميس التفاعلي ورؤية كيف ينبثق إشعار تقييم جوجل على شاشة آيفون افتراضية!
+                </p>
+                <button onclick="openDemoModal()" class="px-8 py-3.5 rounded-2xl bg-white text-gray-900 font-extrabold text-sm shadow-xl hover:bg-gray-100 hover:scale-105 active:scale-95 transition-all inline-flex items-center gap-2">
+                    <i class="fa-solid fa-hand-pointer text-blue-600"></i> تشغيل محاكي NFC الذكي الآن
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Kiosk Section -->
+    <section id="products" class="py-20 bg-gray-950">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                <div>
+                    <span class="px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold uppercase">
+                        OUR PRODUCTS
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white mt-3">
+                        تشكيلة البطاقات وقواعد الطاولة الذكية
+                    </h2>
+                </div>
+                <p class="text-gray-400 text-sm max-w-md mt-4 md:mt-0">
+                    مصممة بمتانة عالية لمقاومة الخدوش والماء، وتعمل مدى الحياة بدون شحن أو بطاريات.
+                </p>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Product 1: Google Reviews Acrylic Stand -->
+                <div class="glass-panel rounded-3xl p-6 border border-gray-800 hover:border-blue-500/50 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="relative w-full h-64 rounded-2xl bg-gray-900 p-4 flex items-center justify-center mb-6 overflow-hidden border border-gray-800 group-hover:scale-[1.02] transition-transform">
+                            <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-blue-600 text-white text-[11px] font-bold">الأكثر مبيعاً 🌟</span>
+                            <!-- Mock Product Render -->
+                            <div class="w-40 h-56 bg-white rounded-xl shadow-xl p-3 flex flex-col justify-between items-center text-gray-900 border border-gray-200">
+                                <div class="text-center">
+                                    <span class="text-[10px] text-amber-500 font-bold">★★★★★</span>
+                                    <i class="fa-brands fa-google text-2xl text-blue-500 block my-1"></i>
+                                    <p class="text-[10px] font-black">REVIEW US ON GOOGLE</p>
+                                </div>
+                                <div class="w-full py-1.5 bg-blue-50 rounded-lg text-center border border-blue-200">
+                                    <span class="text-[9px] font-bold text-blue-700">TAP NFC HERE</span>
+                                </div>
+                                <div class="w-8 h-8 bg-gray-100 p-0.5 rounded">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=google" alt="QR" class="w-full h-full">
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-white mb-2">قاعدة تقييمات جوجل الأكريليك</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                            قاعدة مكتب وطاولة مصنوعة من الأكريليك الشفاف المقوى بسمك 3 ملم، مثالية لكاونترات الاستقبال والمطاعم والعيادات.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between py-3 border-t border-gray-800 mb-4">
+                            <span class="text-2xl font-black text-white">149 <span class="text-xs font-normal text-gray-400">ر.س</span></span>
+                            <span class="text-xs text-emerald-400 font-semibold">شامل البرمجة مجاناً</span>
+                        </div>
+                        <button onclick="quickAddToCart('قاعدة تقييمات جوجل الأكريليك', 149, 'google')" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cart-shopping"></i> إضافة للسلة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 2: Instagram Follow Acrylic Stand -->
+                <div class="glass-panel rounded-3xl p-6 border border-gray-800 hover:border-pink-500/50 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="relative w-full h-64 rounded-2xl bg-gray-900 p-4 flex items-center justify-center mb-6 overflow-hidden border border-gray-800 group-hover:scale-[1.02] transition-transform">
+                            <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-pink-600 text-white text-[11px] font-bold">للكافيهات والمتاجر 📸</span>
+                            <!-- Mock Product Render -->
+                            <div class="w-40 h-56 bg-gradient-to-b from-purple-600 via-pink-600 to-amber-500 rounded-xl shadow-xl p-3 flex flex-col justify-between items-center text-white">
+                                <div class="text-center">
+                                    <i class="fa-brands fa-instagram text-3xl block my-1"></i>
+                                    <p class="text-[10px] font-black">FOLLOW US ON INSTAGRAM</p>
+                                </div>
+                                <div class="w-full py-1.5 bg-white/20 rounded-lg text-center backdrop-blur-sm border border-white/30">
+                                    <span class="text-[9px] font-bold">TAP NFC HERE</span>
+                                </div>
+                                <div class="w-8 h-8 bg-white p-0.5 rounded">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=instagram" alt="QR" class="w-full h-full">
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-white mb-2">قاعدة زيادة متابعي إنستغرام</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                            مصممة بألوان إنستغرام المبهجة، توجه الزبائن لمتابعة حسابك ومشاركة تجاربهم في الاستوري بلمسة واحدة.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between py-3 border-t border-gray-800 mb-4">
+                            <span class="text-2xl font-black text-white">149 <span class="text-xs font-normal text-gray-400">ر.س</span></span>
+                            <span class="text-xs text-emerald-400 font-semibold">شامل البرمجة مجاناً</span>
+                        </div>
+                        <button onclick="quickAddToCart('قاعدة زيادة متابعي إنستغرام', 149, 'instagram')" class="w-full py-3 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-sm shadow-lg shadow-pink-600/30 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cart-shopping"></i> إضافة للسلة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 3: TikTok Smart Stand -->
+                <div class="glass-panel rounded-3xl p-6 border border-gray-800 hover:border-cyan-400/50 transition-all group flex flex-col justify-between">
+                    <div>
+                        <div class="relative w-full h-64 rounded-2xl bg-gray-900 p-4 flex items-center justify-center mb-6 overflow-hidden border border-gray-800 group-hover:scale-[1.02] transition-transform">
+                            <!-- Mock Product Render -->
+                            <div class="w-40 h-56 bg-black border border-gray-800 rounded-xl shadow-xl p-3 flex flex-col justify-between items-center text-white">
+                                <div class="text-center">
+                                    <i class="fa-brands fa-tiktok text-3xl text-cyan-400 block my-1"></i>
+                                    <p class="text-[10px] font-black">FOLLOW ON TIKTOK</p>
+                                </div>
+                                <div class="w-full py-1.5 bg-gray-900 rounded-lg text-center border border-gray-700">
+                                    <span class="text-[9px] font-bold text-cyan-400">TAP NFC HERE</span>
+                                </div>
+                                <div class="w-8 h-8 bg-white p-0.5 rounded">
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=tiktok" alt="QR" class="w-full h-full">
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-white mb-2">قاعدة متابعين تيك توك الفوسفورية</h3>
+                        <p class="text-gray-400 text-xs leading-relaxed mb-4">
+                            تجذب الشباب والزبائن لمشاهدة فيديوهات منتجاتك والاشتراك في حساب التيك توك لمشاهدة العروض الحصرية.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between py-3 border-t border-gray-800 mb-4">
+                            <span class="text-2xl font-black text-white">149 <span class="text-xs font-normal text-gray-400">ر.س</span></span>
+                            <span class="text-xs text-emerald-400 font-semibold">شامل البرمجة مجاناً</span>
+                        </div>
+                        <button onclick="quickAddToCart('قاعدة متابعين تيك توك الفوسفورية', 149, 'tiktok')" class="w-full py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-cyan-400 border border-cyan-400/30 font-bold text-sm transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cart-shopping"></i> إضافة للسلة
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI Business Calculator -->
+    <section id="roi" class="py-20 bg-gray-900 border-t border-gray-800 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Calculator Inputs -->
+                <div class="lg:col-span-6 space-y-6">
+                    <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase">
+                        BUSINESS ROI CALCULATOR
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-black text-white">
+                        احسب كم تقييم إيجابي جديد ستحصل عليه شهرياً!
+                    </h2>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        سهولة التقييم ترفع نسبة استجابة الزبان من أقل من %2 إلى أكثر من %25! حرك المؤشرات أدناه لرؤية الأثر المباشر على نشاطك التجاري.
+                    </p>
+
+                    <!-- Slider 1: Daily Visitors -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-3">
+                        <div class="flex justify-between items-center text-sm font-bold">
+                            <span class="text-gray-200">عدد العملاء والزوار اليومي لمكانك:</span>
+                            <span id="sliderVisitorsVal" class="text-xl font-black text-blue-400">50 زائر</span>
+                        </div>
+                        <input type="range" id="sliderVisitors" min="10" max="300" step="5" value="50" oninput="calculateROI()" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                    </div>
+
+                    <!-- Slider 2: Conversion % -->
+                    <div class="glass-panel p-6 rounded-2xl space-y-3">
+                        <div class="flex justify-between items-center text-sm font-bold">
+                            <span class="text-gray-200">نسبة الزوار الذين يقومون باللمس (التقديرية):</span>
+                            <span id="sliderConvVal" class="text-xl font-black text-emerald-400">20%</span>
+                        </div>
+                        <input type="range" id="sliderConv" min="5" max="50" step="1" value="20" oninput="calculateROI()" class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                    </div>
+                </div>
+
+                <!-- ROI Projection Cards Output -->
+                <div class="lg:col-span-6 glass-panel p-8 rounded-3xl border border-emerald-500/30 relative overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950/30">
+                    <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-emerald-400"></i> العائد المتوقع لنشاطك التجاري:
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="p-5 rounded-2xl bg-gray-900/80 border border-gray-800">
+                            <span class="text-xs text-gray-400 block mb-1">تقييمات جديدة شهرياً</span>
+                            <span id="roiMonthlyReviews" class="text-3xl font-black text-emerald-400">+300</span>
+                            <span class="text-[10px] text-gray-500 block mt-1">تقييم 5 نجوم حقيقي</span>
+                        </div>
+                        <div class="p-5 rounded-2xl bg-gray-900/80 border border-gray-800">
+                            <span class="text-xs text-gray-400 block mb-1">تقييمات سنوية متوقعة</span>
+                            <span id="roiYearlyReviews" class="text-3xl font-black text-blue-400">+3,600</span>
+                            <span class="text-[10px] text-gray-500 block mt-1">ترفع تصدرك في خرائط جوجل</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs leading-relaxed font-semibold">
+                        <i class="fa-solid fa-lightbulb text-amber-400 text-sm ml-1"></i>
+                        الوصول لـ <span id="roiStarsText">300 تقييم شهرياً</span> يرفع ترتيبك في نتائج البحث المحلي بخرائط جوجل (Local SEO) بنسبة تصل إلى 40%، مما يجذب زبائن جدد تلقائياً دون إعلانات مدفوعة!
+                    </div>
+
+                    <a href="#customizer" class="mt-6 w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-black text-sm text-center block transition-all">
+                        اطلب بطاقتك الآن وابدأ في جمع التقييمات
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-20 bg-gray-950 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl sm:text-4xl font-black text-white">لماذا بطاقاتنا هي الخيار الأول للمتاجر بالمملكة؟</h2>
+                <p class="text-gray-400 text-sm mt-2">جودة تصنيع سويسرية ودعم فني مخصص للأعمال</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 text-center">
+                    <div class="w-12 h-12 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                        <i class="fa-solid fa-infinity"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">استخدام مدى الحياة</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        لا تحتاج لبطاريات ولا شحن ولا تتطلب اشتراكات شهرية نهائياً. أدفع مرة واحدة واستخدمها للأبد.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 text-center">
+                    <div class="w-12 h-12 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                        <i class="fa-solid fa-link-slash"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">تحديث الرابط في أي وقت</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        إذا قمت بتغيير حسابك أو موقعك مستقبلاً، يمكنك إعادة إعادة توجيه البطاقة لرابطك الجديد بسهولة.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 text-center">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">مقاومة للماء والخدش</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        طبقة حماية كريستالية تحمي البطاقات من انسكاب السوائل أو التنظيف المستمر على طاولات المطاعم.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border border-gray-800 text-center">
+                    <div class="w-12 h-12 rounded-xl bg-amber-600/20 text-amber-400 flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-white mb-2">سرعة استجابة فائقة</h3>
+                    <p class="text-gray-400 text-xs leading-relaxed">
+                        شرائح NFC المدمجة ذات حساسية عالية تعمل فور تقريب الهاتف لمسافة 2 سم دون أي تأخير.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-gray-900 border-t border-gray-800">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-black text-white">الأسئلة الشائعة</h2>
+                <p class="text-gray-400 text-sm mt-2">إليك إجابات لأبرز استفسارات أصحاب الأعمال</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="glass-panel rounded-2xl p-5 border border-gray-800 cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center font-bold text-white text-sm md:text-base">
+                        <span>هل ينبغي على الزبون تنزيل أي تطبيق لمسح البطاقة؟</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </div>
+                    <p class="text-gray-400 text-xs md:text-sm mt-3 hidden leading-relaxed">
+                        لا، نهائياً! التقنية مدمجة في نظام تشغيل الآيفون والأندرويد تلقائياً. يضع الزبون هاتفه فوق البطاقة فيظهر الإشعار فوراً، أو يفتح كاميرا الهاتف لمسح رمز الـ QR.
+                    </p>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="glass-panel rounded-2xl p-5 border border-gray-800 cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center font-bold text-white text-sm md:text-base">
+                        <span>كيف أزودكم برابط خرائط جوجل أو حسابي لتعديل البطاقة؟</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </div>
+                    <p class="text-gray-400 text-xs md:text-sm mt-3 hidden leading-relaxed">
+                        أثناء الشراء من المصمم الذكي أعلاه، تضع رابط مكانك على خرائط جوجل أو اسم حسابك. نقوم بنسخ البرمجة بدقة واختبارها قبل الشحن لتوصلك جاهزة للاستخدام المباشر.
+                    </p>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="glass-panel rounded-2xl p-5 border border-gray-800 cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center font-bold text-white text-sm md:text-base">
+                        <span>هل توجد رسوم اشتراك شهري أو سنوي؟</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </div>
+                    <p class="text-gray-400 text-xs md:text-sm mt-3 hidden leading-relaxed">
+                        لا توجد أي رسوم خفية أو اشتراكات نهائياً. تدفع قيمة البطاقات والقواعد مرة واحدة فقط وتعمل معك للأبد.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 border-t border-gray-800 py-12 text-gray-400 text-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-right flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="text-xl font-black text-white">TOUCH<span class="text-blue-500">PLUS</span></span>
+                <p class="text-xs text-gray-500 mt-1">جميع الحقوق محفوظة © 2026 - تاتش بلس لبطاقات التقييم الذكية NFC</p>
+            </div>
+            <div class="flex gap-6 text-gray-400 text-lg">
+                <a href="#" class="hover:text-blue-400"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" class="hover:text-pink-500"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="hover:text-emerald-400"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive NFC Live Tap Demo Modal -->
+    <div id="demoModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 border border-gray-700 relative text-center">
+            <button onclick="closeDemoModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="text-xl font-bold text-white mb-2">محاكي تقنية اللمس NFC الحي</h3>
+            <p class="text-xs text-gray-400 mb-6">قرّب الهاتف الافتراضي نحو حقل اللمس لإظهار النتيجة</p>
+
+            <!-- Phone Simulation Area -->
+            <div class="relative w-64 h-[380px] mx-auto bg-gray-950 rounded-[40px] border-4 border-gray-700 p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
+                <!-- Phone Top Notch -->
+                <div class="w-24 h-4 bg-gray-800 rounded-b-xl mx-auto z-20"></div>
+
+                <!-- Simulation Screen -->
+                <div id="phoneScreen" class="h-full flex flex-col items-center justify-center p-4 text-center transition-all duration-300">
+                    <div id="phoneWaitingState">
+                        <i class="fa-solid fa-hand-pointer text-4xl text-blue-400 animate-bounce mb-3"></i>
+                        <p class="text-xs font-bold text-gray-300">اضغط على البطاقة أدناه لتلميس الهاتف!</p>
+                    </div>
+
+                    <!-- Simulated Notification Popup (Initially Hidden) -->
+                    <div id="phonePopNotification" class="hidden w-full p-3 rounded-2xl bg-white/95 text-gray-900 text-right shadow-2xl border border-gray-200 animate-pulse">
+                        <div class="flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-wifi rotate-90 text-blue-600 text-xs"></i>
+                            <span class="text-[10px] font-bold text-gray-500">TAG READ • NFC</span>
+                        </div>
+                        <p class="text-xs font-black text-gray-900">Google Review Page</p>
+                        <p class="text-[10px] text-gray-600">افتح صفحة كتابة التقييم لـ مطعم السعادة</p>
+                        <div class="mt-2 text-center py-1 bg-blue-600 text-white rounded-lg text-[10px] font-bold">
+                            فتح الرابط الآن 🚀
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Home Bar -->
+                <div class="w-20 h-1 bg-gray-600 rounded-full mx-auto mb-1"></div>
+            </div>
+
+            <!-- Simulated Tap Card Trigger -->
+            <button onclick="triggerSimulatedTap()" class="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm shadow-lg">
+                <i class="fa-solid fa-wifi rotate-90"></i> تلميس البطاقة الآن (Tap NFC)
+            </button>
+        </div>
+    </div>
+
+    <!-- Slide-over Cart Drawer -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex justify-end">
+        <div class="w-full max-w-md bg-gray-900 h-full p-6 flex flex-col justify-between border-r border-gray-800 shadow-2xl">
+            <div>
+                <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-bag-shopping text-blue-500"></i> سلة المشتريات
+                    </h3>
+                    <button onclick="toggleCartDrawer()" class="text-gray-400 hover:text-white text-lg">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div id="cartItemsList" class="space-y-4 max-h-[60vh] overflow-y-auto">
+                    <p class="text-center text-gray-500 text-sm py-8">السلة فارغة حالياً</p>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-4 space-y-4">
+                <div class="flex justify-between items-center text-gray-300 text-sm">
+                    <span>الإجمالي الفرعي:</span>
+                    <span id="cartTotal" class="text-xl font-black text-emerald-400">0 ر.س</span>
+                </div>
+                <button onclick="checkoutAlert()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm shadow-lg">
+                    المتابعة للدفع والتوصيل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic Javascript -->
+    <script>
+        // State variables
+        let currentPlatform = 'google';
+        let currentMaterial = 'acrylic';
+        let currentQty = 1;
+        const unitPrice = 149;
+        let cart = [];
+
+        // Platform Presets Data
+        const platformData = {
+            google: {
+                title: 'REVIEW US ON GOOGLE',
+                logoSvg: `<svg class="w-12 h-12" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>`,
+                bgColor: 'bg-white',
+                textColor: 'text-gray-900',
+                accentColor: 'text-blue-600',
+                showStars: true
+            },
+            instagram: {
+                title: 'TO FOLLOW ON INSTAGRAM',
+                logoSvg: `<i class="fa-brands fa-instagram text-5xl text-pink-500"></i>`,
+                bgColor: 'bg-gradient-to-b from-purple-600 via-pink-600 to-amber-500',
+                textColor: 'text-white',
+                accentColor: 'text-amber-200',
+                showStars: false
+            },
+            tiktok: {
+                title: 'TO FOLLOW ON TIKTOK',
+                logoSvg: `<i class="fa-brands fa-tiktok text-5xl text-cyan-400"></i>`,
+                bgColor: 'bg-black border border-gray-800',
+                textColor: 'text-white',
+                accentColor: 'text-cyan-400',
+                showStars: false
+            },
+            facebook: {
+                title: 'LIKE & FOLLOW US',
+                logoSvg: `<i class="fa-brands fa-facebook text-5xl text-blue-600"></i>`,
+                bgColor: 'bg-blue-600',
+                textColor: 'text-white',
+                accentColor: 'text-blue-200',
+                showStars: false
+            },
+            whatsapp: {
+                title: 'CHAT WITH US ON WHATSAPP',
+                logoSvg: `<i class="fa-brands fa-whatsapp text-5xl text-emerald-400"></i>`,
+                bgColor: 'bg-emerald-950 border border-emerald-800',
+                textColor: 'text-white',
+                accentColor: 'text-emerald-400',
+                showStars: false
+            },
+            tripadvisor: {
+                title: 'REVIEW US ON TRIPADVISOR',
+                logoSvg: `<i class="fa-solid fa-umbrella-beach text-5xl text-amber-400"></i>`,
+                bgColor: 'bg-emerald-900',
+                textColor: 'text-white',
+                accentColor: 'text-amber-300',
+                showStars: true
+            }
+        };
+
+        // Select Platform
+        function setPlatform(plat) {
+            currentPlatform = plat;
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-500/20');
+                btn.classList.add('border-gray-800', 'bg-gray-900/60');
+            });
+            const activeBtn = document.getElementById(`btn-${plat}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('border-gray-800', 'bg-gray-900/60');
+                activeBtn.classList.add('border-blue-500', 'bg-blue-500/20');
+            }
+            updateCardPreview();
+        }
+
+        // Select Material
+        function setMaterial(mat) {
+            currentMaterial = mat;
+            document.querySelectorAll('.mat-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-gray-800', 'text-white');
+                btn.classList.add('border-gray-800', 'bg-gray-900', 'text-gray-400');
+            });
+            const activeBtn = document.getElementById(`mat-${mat}`);
+            if (activeBtn) {
+                activeBtn.classList.add('border-blue-500', 'bg-gray-800', 'text-white');
+            }
+        }
+
+        // Live Card Preview Update
+        function updateCardPreview() {
+            const data = platformData[currentPlatform];
+            const bizName = document.getElementById('inputBizName').value || 'اسم المنشأة التجاري';
+            const targetUrl = document.getElementById('inputTargetUrl').value || 'https://google.com';
+
+            const cardContainer = document.getElementById('tiltContainer');
+            const previewLogo = document.getElementById('previewLogo');
+            const previewTitle = document.getElementById('previewTitle');
+            const previewBizDisplay = document.getElementById('previewBizNameDisplay');
+            const previewStars = document.getElementById('previewStars');
+            const previewQrImage = document.getElementById('previewQrImage');
+
+            // Apply styling
+            cardContainer.className = `tilt-card relative w-72 sm:w-80 h-[460px] rounded-3xl p-6 transition-all duration-200 cursor-pointer shadow-3d-depth border border-white/20 card-sheen ${data.bgColor} ${data.textColor}`;
+            previewLogo.innerHTML = data.logoSvg;
+            previewTitle.innerText = data.title;
+            previewBizDisplay.innerText = bizName;
+            previewBizDisplay.className = `text-xs font-bold mt-1 ${data.accentColor}`;
+
+            if (data.showStars) {
+                previewStars.classList.remove('hidden');
+            } else {
+                previewStars.classList.add('hidden');
+            }
+
+            // Update QR code preview
+            previewQrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(targetUrl)}`;
+        }
+
+        // 3D Parallax Tilt Effect on Mouse Move
+        function handleTilt(e) {
+            const card = document.getElementById('tiltContainer');
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            
+            const tiltX = (y / (rect.height / 2)) * -15;
+            const tiltY = (x / (rect.width / 2)) * 15;
+
+            card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+        }
+
+        function resetTilt() {
+            const card = document.getElementById('tiltContainer');
+            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+        }
+
+        // Change Quantity
+        function changeQty(delta) {
+            currentQty = Math.max(1, currentQty + delta);
+            document.getElementById('customizerQty').innerText = currentQty;
+            document.getElementById('customizerPrice').innerText = (currentQty * unitPrice) + ' ر.س';
+        }
+
+        // ROI Calculator Logic
+        function calculateROI() {
+            const visitors = parseInt(document.getElementById('sliderVisitors').value);
+            const conv = parseInt(document.getElementById('sliderConv').value) / 100;
+
+            document.getElementById('sliderVisitorsVal').innerText = visitors + ' زائر';
+            document.getElementById('sliderConvVal').innerText = Math.round(conv * 100) + '%';
+
+            const monthly = Math.round(visitors * 30 * conv);
+            const yearly = monthly * 12;
+
+            document.getElementById('roiMonthlyReviews').innerText = '+' + monthly.toLocaleString();
+            document.getElementById('roiYearlyReviews').innerText = '+' + yearly.toLocaleString();
+            document.getElementById('roiStarsText').innerText = monthly + ' تقييم شهرياً';
+        }
+
+        // Add Customized Card to Cart
+        function addCustomizedToCart() {
+            const bizName = document.getElementById('inputBizName').value || 'التصميم المخصص';
+            const title = `بطاقات ${platformData[currentPlatform].title} (${bizName})`;
+            
+            cart.push({
+                name: title,
+                price: unitPrice,
+                qty: currentQty,
+                platform: currentPlatform
+            });
+
+            updateCartUI();
+            toggleCartDrawer();
+        }
+
+        function quickAddToCart(name, price, platform) {
+            cart.push({
+                name: name,
+                price: price,
+                qty: 1,
+                platform: platform
+            });
+            updateCartUI();
+            toggleCartDrawer();
+        }
+
+        function updateCartUI() {
+            const cartItemsList = document.getElementById('cartItemsList');
+            const cartBadge = document.getElementById('cartBadge');
+            const cartTotal = document.getElementById('cartTotal');
+
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = `<p class="text-center text-gray-500 text-sm py-8">السلة فارغة حالياً</p>`;
+                cartBadge.innerText = '0';
+                cartTotal.innerText = '0 ر.س';
+                return;
+            }
+
+            let total = 0;
+            let totalQty = 0;
+            let html = '';
+
+            cart.forEach((item, index) => {
+                total += item.price * item.qty;
+                totalQty += item.qty;
+                html += `
+                    <div class="p-3 bg-gray-800 rounded-xl flex items-center justify-between border border-gray-700">
+                        <div>
+                            <p class="text-xs font-bold text-white">${item.name}</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">${item.qty} × ${item.price} ر.س</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 text-xs">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            cartItemsList.innerHTML = html;
+            cartBadge.innerText = totalQty;
+            cartTotal.innerText = total + ' ر.س';
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCartDrawer() {
+            const drawer = document.getElementById('cartDrawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        // Demo Modal
+        function openDemoModal() {
+            document.getElementById('demoModal').classList.remove('hidden');
+        }
+
+        function closeDemoModal() {
+            document.getElementById('demoModal').classList.add('hidden');
+            document.getElementById('phonePopNotification').classList.add('hidden');
+            document.getElementById('phoneWaitingState').classList.remove('hidden');
+        }
+
+        function triggerSimulatedTap() {
+            document.getElementById('phoneWaitingState').classList.add('hidden');
+            document.getElementById('phonePopNotification').classList.remove('hidden');
+        }
+
+        function simulateTapOnCustomCard() {
+            openDemoModal();
+            setTimeout(() => {
+                triggerSimulatedTap();
+            }, 600);
+        }
+
+        // FAQ Toggle
+        function toggleFaq(element) {
+            const content = element.querySelector('p');
+            const icon = element.querySelector('i');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        function checkoutAlert() {
+            if(cart.length === 0) {
+                alert('السلة فارغة!');
+                return;
+            }
+            alert('شكراً لك! سيتم تحويلك لبوابة الدفع الإلكتروني وتفاصيل التوصيل.');
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            updateCardPreview();
+            calculateROI();
+        };
+    </script>
+
+</body>
+</html>
